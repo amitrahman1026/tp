@@ -23,6 +23,7 @@ public class RemoveModuleCommand extends Command {
 
     private static final String ERROR_WRONG_FORMAT = "Wrong format, should be: " + COMMAND_USAGE;
     public static final String MODULE_NOT_FOUND = "Module not found in database! Please enter a valid module code!";
+    public static final String MODULE_NOT_OFFERED = "Module not offered this semester! Please enter a valid module code!";
 
     public RemoveModuleCommand(String[] input) throws YamomException {
         super(input);
@@ -39,17 +40,25 @@ public class RemoveModuleCommand extends Command {
     public void execute(State state, Ui ui, Storage storage) {
         int semester = state.getSemester();
 
-        SelectedModule selectedModule = new SelectedModule(module, semester);
+        try {
+            SelectedModule selectedModule = new SelectedModule(module, semester);
 
-        List<SelectedModule> currentSelectedModules = state.getSelectedModulesList();
+            List<SelectedModule> currentSelectedModules = state.getSelectedModulesList();
 
-        if (currentSelectedModules.contains(selectedModule)) {
-            state.removeSelectedModule(selectedModule);
-            successful = true;
+            if (currentSelectedModules.contains(selectedModule)) {
+                state.removeSelectedModule(selectedModule);
+                successful = true;
+            }
+
+            ui.addMessage(getExecutionMessage());
+            ui.displayUi();
+
+        } catch (Exception e) {
+            ui.addMessage(MODULE_NOT_OFFERED);
+            ui.displayUi();
+
         }
 
-        ui.addMessage(getExecutionMessage());
-        ui.displayUi();
     }
 
     @Override
